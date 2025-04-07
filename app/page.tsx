@@ -1,7 +1,12 @@
+import SearchBar from '@/components/SearchBar';
+
 export default async function Home() {
   return (
-    <main>
-      <h1>Hello, World!</h1>
-    </main>
+    <>
+      <header>
+        <SearchBar />
+      </header>
+      <main></main>
+    </>
   );
 }
