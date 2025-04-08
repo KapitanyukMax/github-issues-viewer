@@ -17,6 +17,6 @@ export interface IssueInfo extends GitHubIssue {
 export interface RepoInfo {
   owner: string;
   repo: string;
-  stars: number;
+  stars: string;
   issues: IssueInfo[];
 }

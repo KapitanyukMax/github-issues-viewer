@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 interface NavBarProps {
   owner: string;
   repo: string;
-  stars: number;
+  stars: string;
 }
 
 export default function NavBar({ owner, repo, stars }: NavBarProps) {
@@ -17,11 +17,11 @@ export default function NavBar({ owner, repo, stars }: NavBarProps) {
     router.push(url);
   };
   return (
-    <div className="flex flex-row gap-8 align-baseline">
-      <nav className="flex flex-row align-baseline">
+    <div className="flex flex-row gap-6 items-baseline pt-2 pb-4">
+      <nav className="flex flex-row gap-2 items-baseline">
         <Button
           variant="link"
-          className="text-blue-400 hover:no-underline"
+          className="text-blue-400 p-0 hover:no-underline"
           onClick={() => navigateToUrl(ownerUrl)}
         >
           {owner}
@@ -29,13 +29,13 @@ export default function NavBar({ owner, repo, stars }: NavBarProps) {
         <span className="text-blue-400">&gt;</span>
         <Button
           variant="link"
-          className="text-blue-400 hover:no-underline"
+          className="text-blue-400 p-0 hover:no-underline"
           onClick={() => navigateToUrl(repoUrl)}
         >
           {repo}
         </Button>
       </nav>
-      <span>{stars}</span>
+      <span>⭐{stars} stars</span>
     </div>
   );
 }

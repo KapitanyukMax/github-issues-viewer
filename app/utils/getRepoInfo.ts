@@ -1,5 +1,11 @@
 import { GitHubIssue, IssueInfo, RepoInfo } from '../types/github';
 
+function formatNumber(n: number): string {
+  if (n < 1000) return n.toString();
+  if (n < 1_000_000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + ' K';
+  return (n / 1_000_000).toFixed(1).replace(/\.0$/, '') + ' M';
+}
+
 function getCacheKey(owner: string, repo: string) {
   return `gh-issues-${owner}-${repo}`;
 }
@@ -26,13 +32,14 @@ async function fetchGitHubIssues(owner: string, repo: string): Promise<IssueInfo
   return issuesInfo;
 }
 
-async function fetchRepoStars(owner: string, repo: string): Promise<number> {
+async function fetchRepoStars(owner: string, repo: string): Promise<string> {
   const url = `https://api.github.com/repos/${owner}/${repo}`;
 
   const response = await fetch(url);
   const data = (await response.json()) as { stargazers_count: number };
+  console.log(data);
 
-  return data.stargazers_count;
+  return formatNumber(data.stargazers_count);
 }
 
 export async function getRepoInfo(owner: string, repo: string): Promise<RepoInfo> {
