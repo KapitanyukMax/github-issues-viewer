@@ -1,3 +1,5 @@
+export type IssueStatus = 'to-do' | 'in-progress' | 'done';
+
 export interface GitHubIssue {
   title: string;
   number: number;
@@ -11,7 +13,7 @@ export interface GitHubIssue {
 }
 
 export interface IssueInfo extends GitHubIssue {
-  status: 'to-do' | 'in-progress' | 'done';
+  status: IssueStatus;
 }
 
 export interface RepoInfo {

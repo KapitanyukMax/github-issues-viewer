@@ -42,7 +42,7 @@ async function fetchRepoStars(owner: string, repo: string): Promise<string> {
   return formatNumber(data.stargazers_count);
 }
 
-export async function getRepoInfo(owner: string, repo: string): Promise<RepoInfo> {
+async function getRepoInfo(owner: string, repo: string): Promise<RepoInfo> {
   const cached = loadFromCache(owner, repo);
   if (cached) {
     return cached;
@@ -60,3 +60,5 @@ export async function getRepoInfo(owner: string, repo: string): Promise<RepoInfo
   localStorage.setItem(getCacheKey(owner, repo), JSON.stringify(repoInfo));
   return repoInfo;
 }
+
+export { getCacheKey, getRepoInfo };

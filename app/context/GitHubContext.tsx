@@ -1,12 +1,13 @@
 'use client';
 import { createContext, useState, useContext, useCallback } from 'react';
 import { RepoInfo } from '../types/github';
-import { getRepoInfo } from '../utils/getRepoInfo';
+import { getCacheKey, getRepoInfo } from '../utils/getRepoInfo';
 
 interface GitHubContextType {
   repoInfo: RepoInfo | null;
   loading: boolean;
   loadRepoInfo: (owner: string, repo: string) => Promise<void>;
+  updateRepoInfo: (owner: string, repo: string, newRepoInfo: RepoInfo) => void;
 }
 
 const GitHubContext = createContext<GitHubContextType | undefined>(undefined);
@@ -28,8 +29,13 @@ export const GitHubProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
+  const updateRepoInfo = useCallback(async (owner: string, repo: string, newRepoInfo: RepoInfo) => {
+    localStorage.setItem(getCacheKey(owner, repo), JSON.stringify(newRepoInfo));
+    setRepoInfo(newRepoInfo);
+  }, []);
+
   return (
-    <GitHubContext.Provider value={{ repoInfo, loading, loadRepoInfo }}>
+    <GitHubContext.Provider value={{ repoInfo, loading, loadRepoInfo, updateRepoInfo }}>
       {children}
     </GitHubContext.Provider>
   );

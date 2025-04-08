@@ -2,6 +2,8 @@
 import SearchBar from '@/components/SearchBar';
 import NavBar from '@/components/NavBar';
 import { useGitHub } from './context/GitHubContext';
+import IssuesView from '@/components/IssuesView';
+import { IssueInfo } from './types/github';
 
 export default function Home() {
   const { repoInfo } = useGitHub();
@@ -12,7 +14,9 @@ export default function Home() {
         <SearchBar />
       </header>
       {repoInfo && <NavBar {...repoInfo} />}
-      <main></main>
+      <main className="flex-1 flex">
+        <IssuesView issues={repoInfo?.issues ?? new Array<IssueInfo>()} />
+      </main>
     </>
   );
 }
