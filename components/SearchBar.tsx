@@ -1,12 +1,12 @@
 'use client';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { useIssues } from '@/app/context/IssuesContext';
+import { ChangeEvent, useState } from 'react';
+import { useGitHub } from '@/app/context/GitHubContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { isValidGitHubRepoUrl, parseGitHubRepoUrl } from '@/app/utils/githubUrls';
 
 export default function SearchBar() {
-  const { loadIssues, issues } = useIssues();
+  const { loadRepoInfo } = useGitHub();
   const [error, setError] = useState<string | null>(null);
   const [url, setUrl] = useState('');
 
@@ -29,12 +29,8 @@ export default function SearchBar() {
 
     const { owner, repo } = parseGitHubRepoUrl(url);
 
-    await loadIssues(owner, repo);
+    await loadRepoInfo(owner, repo);
   };
-
-  useEffect(() => {
-    console.log(issues);
-  }, [issues]);
 
   return (
     <div className="flex gap-4">

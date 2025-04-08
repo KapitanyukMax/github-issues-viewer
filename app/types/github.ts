@@ -1,20 +1,22 @@
 export interface GitHubIssue {
-  id: number;
-  number: number;
   title: string;
-  html_url: string;
+  number: number;
   state: 'open' | 'closed';
   created_at: string;
-  updated_at: string;
-  body: string;
+  closed_at: string | null;
   user: {
     login: string;
-    html_url: string;
   };
-  repository_url: string;
-  labels: {
-    id: number;
-    name: string;
-    color: string;
-  }[];
+  comments: number;
+}
+
+export interface IssueInfo extends GitHubIssue {
+  status: 'to-do' | 'in-progress' | 'done';
+}
+
+export interface RepoInfo {
+  owner: string;
+  repo: string;
+  stars: number;
+  issues: IssueInfo[];
 }
