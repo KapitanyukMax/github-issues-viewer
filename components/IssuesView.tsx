@@ -45,7 +45,7 @@ export default function IssuesView() {
           <h2 className="font-bold text-center">Done</h2>
         </div>
 
-        <IssuesGroup issueStatus="to-do" />
+        <IssuesGroup issueStatus="to-do" loadable />
         <IssuesGroup issueStatus="in-progress" />
         <IssuesGroup issueStatus="done" />
       </div>

@@ -6,7 +6,7 @@ import { getCacheKey, getRepoInfo } from '../utils/getRepoInfo';
 interface GitHubContextType {
   repoInfo: RepoInfo | null;
   loading: boolean;
-  loadRepoInfo: (owner: string, repo: string) => Promise<void>;
+  loadRepoInfo: (owner: string, repo: string, loadMore: boolean) => Promise<void>;
   unloadRepoInfo: () => void;
   updateRepoInfo: (owner: string, repo: string, newRepoInfo: RepoInfo) => void;
 }
@@ -17,10 +17,10 @@ export const GitHubProvider = ({ children }: { children: React.ReactNode }) => {
   const [repoInfo, setRepoInfo] = useState<RepoInfo | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const loadRepoInfo = useCallback(async (owner: string, repo: string) => {
+  const loadRepoInfo = useCallback(async (owner: string, repo: string, loadMore: boolean) => {
     setLoading(true);
     try {
-      const fetched = await getRepoInfo(owner, repo);
+      const fetched = await getRepoInfo(owner, repo, loadMore);
       setRepoInfo(fetched);
     } catch (err) {
       console.error('Failed to load repo info:', err);

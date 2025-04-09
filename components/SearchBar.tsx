@@ -16,7 +16,7 @@ export default function SearchBar() {
 
     setUrl(savedUrl);
     const { owner, repo } = parseGitHubRepoUrl(savedUrl);
-    loadRepoInfo(owner, repo);
+    loadRepoInfo(owner, repo, false);
   }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -41,7 +41,7 @@ export default function SearchBar() {
 
     const { owner, repo } = parseGitHubRepoUrl(url);
 
-    await loadRepoInfo(owner, repo);
+    await loadRepoInfo(owner, repo, false);
   };
 
   return (

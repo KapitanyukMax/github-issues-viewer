@@ -79,13 +79,25 @@ function loadFromCache(owner: string, repo: string): RepoInfo | null {
   }
 }
 
-async function fetchGitHubIssues(owner: string, repo: string): Promise<IssueInfo[]> {
-  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues`);
+async function fetchGitHubIssues(owner: string, repo: string, page: number): Promise<IssueInfo[]> {
+  const url = `https://api.github.com/repos/${owner}/${repo}/issues?per_page=50&page=${page}`;
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`Fetch error: ${res.text}`);
+  }
+
   const issues = (await res.json()) as GitHubIssue[];
-  const issuesInfo: IssueInfo[] = issues.map(issue => ({
-    ...issue,
-    status: 'to-do',
-  }));
+  const issuesInfo: IssueInfo[] = issues.map(issue => {
+    console.log(issue);
+    return {
+      ...issue,
+      status: 'to-do',
+    };
+  });
 
   return issuesInfo;
 }
@@ -93,26 +105,37 @@ async function fetchGitHubIssues(owner: string, repo: string): Promise<IssueInfo
 async function fetchRepoStars(owner: string, repo: string): Promise<string> {
   const url = `https://api.github.com/repos/${owner}/${repo}`;
 
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
+    },
+  });
   const data = (await response.json()) as { stargazers_count: number };
   console.log(data);
 
   return formatNumber(data.stargazers_count);
 }
 
-async function getRepoInfo(owner: string, repo: string): Promise<RepoInfo> {
+async function getRepoInfo(owner: string, repo: string, loadMore: boolean): Promise<RepoInfo> {
   const cached = loadFromCache(owner, repo);
+
+  let page = 1;
   if (cached) {
-    return cached;
+    if (loadMore && !cached.isFullyLoaded) {
+      page = cached.pagesLoaded + 1;
+    } else return cached;
   }
 
-  const issuesInfo = await fetchGitHubIssues(owner, repo);
+  const issuesInfo = await fetchGitHubIssues(owner, repo, page);
+  const isFullyLoaded = issuesInfo.length < 50;
   const repoStars = await fetchRepoStars(owner, repo);
   const repoInfo: RepoInfo = {
     owner,
     repo,
     stars: repoStars,
-    issues: issuesInfo,
+    issues: [...(cached?.issues ?? []), ...issuesInfo],
+    pagesLoaded: page,
+    isFullyLoaded,
   };
 
   localStorage.setItem(getCacheKey(owner, repo), JSON.stringify(repoInfo));

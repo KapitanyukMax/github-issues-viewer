@@ -21,4 +21,6 @@ export interface RepoInfo {
   repo: string;
   stars: string;
   issues: IssueInfo[];
+  pagesLoaded: number;
+  isFullyLoaded: boolean;
 }
