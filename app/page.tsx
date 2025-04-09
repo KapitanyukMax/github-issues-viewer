@@ -14,8 +14,8 @@ export default function Home() {
         <SearchBar />
       </header>
       {repoInfo && <NavBar {...repoInfo} />}
-      <main className="flex-1 flex">
-        <IssuesView issues={repoInfo?.issues ?? new Array<IssueInfo>()} />
+      <main className="flex-1 flex overflow-hidden">
+        <IssuesView />
       </main>
     </>
   );

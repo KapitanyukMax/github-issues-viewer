@@ -10,6 +10,64 @@ function getCacheKey(owner: string, repo: string) {
   return `gh-issues-${owner}-${repo}`;
 }
 
+function getTimeDiffStr(fromDate: Date, toDate: Date) {
+  const isFuture = fromDate > toDate;
+  let start = isFuture ? toDate : fromDate;
+  let end = isFuture ? fromDate : toDate;
+
+  let years = end.getFullYear() - start.getFullYear();
+  let months = end.getMonth() - start.getMonth();
+  let days = end.getDate() - start.getDate();
+
+  if (days < 0) {
+    months--;
+    const prevMonth = new Date(end.getFullYear(), end.getMonth(), 0);
+    days += prevMonth.getDate();
+  }
+
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  let res;
+  if (years > 0) {
+    res = `${years} year${years !== 1 ? 's' : ''}`;
+  }
+  if (months > 0) {
+    res = `${months} month${months !== 1 ? 's' : ''}`;
+  }
+  if (days > 0) {
+    res = `${days} day${days !== 1 ? 's' : ''}`;
+  }
+  if (res) {
+    return isFuture ? `in ${res}` : `${res} ago`;
+  }
+
+  const msDiff = Math.abs(toDate.getTime() - fromDate.getTime());
+  const timePartMs = msDiff % (1000 * 60 * 60 * 24);
+
+  const hours = Math.floor(timePartMs / (1000 * 60 * 60));
+  const minutes = Math.floor((timePartMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  if (hours > 0) {
+    res = `${hours} hour${hours !== 1 ? 's' : ''}`;
+  }
+  if (minutes > 0) {
+    res = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+  }
+  res ||= 'a moment';
+
+  return isFuture ? `in ${res}` : `${res} ago`;
+}
+
+function getIssueStateInfo(issue: IssueInfo) {
+  const now = new Date();
+  const time_str = issue.state === 'closed' ? issue.closed_at! : issue.created_at;
+  const time = new Date(time_str);
+  return `${issue.state} ${getTimeDiffStr(time, now)}`;
+}
+
 function loadFromCache(owner: string, repo: string): RepoInfo | null {
   try {
     const raw = localStorage.getItem(getCacheKey(owner, repo));
@@ -61,4 +119,4 @@ async function getRepoInfo(owner: string, repo: string): Promise<RepoInfo> {
   return repoInfo;
 }
 
-export { getCacheKey, getRepoInfo };
+export { getCacheKey, getRepoInfo, getIssueStateInfo };

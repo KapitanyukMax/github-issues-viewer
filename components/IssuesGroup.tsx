@@ -9,14 +9,17 @@ interface IssuesGroupProps {
 }
 
 export default function IssuesGroup({ issueStatus }: IssuesGroupProps) {
-  const { repoInfo, updateRepoInfo } = useGitHub();
+  const { repoInfo } = useGitHub();
   const filteredIssues = repoInfo?.issues.filter(issue => issue.status === issueStatus);
   const { isOver, setNodeRef } = useDroppable({ id: issueStatus });
 
   return (
     <div
       ref={setNodeRef}
-      className={cn(isOver ? 'opacity-50' : 'opacity-100', 'w-full h-full bg-gray-100 border')}
+      className={cn(
+        isOver ? 'bg-green-100' : 'bg-gray-100',
+        'w-full h-full  border overflow-y-auto flex flex-col gap-4 p-4'
+      )}
     >
       {filteredIssues?.map(issue => <IssueView issue={issue} key={issue.number} />)}
     </div>

@@ -7,6 +7,7 @@ interface GitHubContextType {
   repoInfo: RepoInfo | null;
   loading: boolean;
   loadRepoInfo: (owner: string, repo: string) => Promise<void>;
+  unloadRepoInfo: () => void;
   updateRepoInfo: (owner: string, repo: string, newRepoInfo: RepoInfo) => void;
 }
 
@@ -29,13 +30,20 @@ export const GitHubProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
+  const unloadRepoInfo = useCallback(() => {
+    setLoading(false);
+    setRepoInfo(null);
+  }, []);
+
   const updateRepoInfo = useCallback(async (owner: string, repo: string, newRepoInfo: RepoInfo) => {
     localStorage.setItem(getCacheKey(owner, repo), JSON.stringify(newRepoInfo));
     setRepoInfo(newRepoInfo);
   }, []);
 
   return (
-    <GitHubContext.Provider value={{ repoInfo, loading, loadRepoInfo, updateRepoInfo }}>
+    <GitHubContext.Provider
+      value={{ repoInfo, loading, loadRepoInfo, unloadRepoInfo, updateRepoInfo }}
+    >
       {children}
     </GitHubContext.Provider>
   );

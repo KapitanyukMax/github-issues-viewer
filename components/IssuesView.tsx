@@ -1,14 +1,40 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { DndContext, DragEndEvent } from '@dnd-kit/core';
+import React, { useState } from 'react';
+import { DndContext, DragOverlay, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import IssuesGroup from './IssuesGroup';
-import { IssueInfo } from '@/app/types/github';
+import { IssueStatus } from '@/app/types/github';
+import { useGitHub } from '@/app/context/GitHubContext';
+import IssueView from './IssueView';
 
 export default function IssuesView() {
+  const { repoInfo, updateRepoInfo } = useGitHub();
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  let draggedIssue;
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setDraggedId(event.active.id as string);
+  };
+
+  function handleDragEnd({ over, active }: DragEndEvent) {
+    if (!repoInfo) return;
+
+    const index = repoInfo.issues.findIndex(
+      issue => issue.number.toString() === active.id.toString()
+    );
+    if (index === -1) return;
+
+    repoInfo.issues[index].status = over?.id as IssueStatus;
+    updateRepoInfo(repoInfo.owner, repoInfo.repo, repoInfo);
+    setDraggedId(null);
+  }
+
+  const getIssueById = (draggedId: string) =>
+    repoInfo?.issues.find(issue => issue.number.toString() === draggedId);
+
   return (
-    <DndContext onDragEnd={handleDragEnd}>
-      <div className="grid grid-cols-3 grid-rows-[auto_1fr] w-full gap-x-6 gap-y-2 py-4">
+    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <div className="grid grid-cols-3 grid-rows-[auto_1fr] w-full h-full gap-x-6 gap-y-2 py-4">
         <div>
           <h2 className="font-bold text-center">ToDo</h2>
         </div>
@@ -23,11 +49,12 @@ export default function IssuesView() {
         <IssuesGroup issueStatus="in-progress" />
         <IssuesGroup issueStatus="done" />
       </div>
+
+      <DragOverlay>
+        {draggedId && (draggedIssue = getIssueById(draggedId)) && (
+          <IssueView issue={draggedIssue} />
+        )}
+      </DragOverlay>
     </DndContext>
   );
-
-  function handleDragEnd({ over, active }: DragEndEvent) {
-    //console.log(active);
-    //setParent(over ? over.id.toString() : null);
-  }
 }
