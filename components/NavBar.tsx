@@ -21,7 +21,7 @@ export default function NavBar({ owner, repo, stars }: NavBarProps) {
       <nav className="flex flex-row gap-2 items-baseline">
         <Button
           variant="link"
-          className="text-blue-400 p-0 hover:no-underline"
+          className="text-blue-400 p-0 hover:no-underline hover:cursor-pointer hover:text-blue-500"
           onClick={() => navigateToUrl(ownerUrl)}
         >
           {owner}
@@ -29,7 +29,7 @@ export default function NavBar({ owner, repo, stars }: NavBarProps) {
         <span className="text-blue-400">&gt;</span>
         <Button
           variant="link"
-          className="text-blue-400 p-0 hover:no-underline"
+          className="text-blue-400 p-0 hover:no-underline hover:cursor-pointer hover:text-blue-500"
           onClick={() => navigateToUrl(repoUrl)}
         >
           {repo}
