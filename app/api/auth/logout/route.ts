@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCookiesFromRequest, clearAuthCookies } from '@/lib/cookies';
+import { getCookiesFromRequest, clearAuthCookie } from '@/lib/cookies';
 import { logoutSession } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
@@ -10,12 +10,12 @@ export async function POST(req: NextRequest) {
     await logoutSession(refreshToken);
   }
 
-  const [clearAccess, clearRefresh] = clearAuthCookies();
+  const clearRefresh = clearAuthCookie();
 
-  const response = new NextResponse(null, {
+  return new NextResponse(null, {
     status: 204,
+    headers: {
+      'Set-Cookie': clearRefresh,
+    },
   });
-  response.headers.append('Set-Cookie', clearAccess);
-  response.headers.append('Set-Cookie', clearRefresh);
-  return response;
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { refreshSession } from '@/lib/auth';
-import { getCookiesFromRequest, setAuthCookies } from '@/lib/cookies';
+import { getCookiesFromRequest, setAuthCookie } from '@/lib/cookies';
 
 export async function POST(req: NextRequest) {
   const cookies = getCookiesFromRequest(req);
@@ -13,14 +13,14 @@ export async function POST(req: NextRequest) {
   try {
     const { accessToken, refreshToken: newRefreshToken } = await refreshSession(refreshToken);
 
-    const [accessCookie, refreshCookie] = setAuthCookies(accessToken, newRefreshToken);
+    const refreshCookie = setAuthCookie(newRefreshToken);
 
-    const response = new NextResponse(null, {
+    return new NextResponse(JSON.stringify({ accessToken }), {
       status: 204,
+      headers: {
+        'Set-Cookie': refreshCookie,
+      },
     });
-    response.headers.append('Set-Cookie', accessCookie);
-    response.headers.append('Set-Cookie', refreshCookie);
-    return response;
   } catch {
     return NextResponse.json({ error: 'Invalid refresh token' }, { status: 403 });
   }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { loginUser } from '@/lib/auth';
-import { setAuthCookies } from '@/lib/cookies';
+import { setAuthCookie } from '@/lib/cookies';
+import { getAccessTokenFromRequest } from '@/lib/auth-header';
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
@@ -15,9 +16,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid username or password' }, { status: 401 });
   }
 
-  const [accessCookie, refreshCookie] = setAuthCookies(result.accessToken, result.refreshToken);
+  const accessToken = getAccessTokenFromRequest(req);
+  const refreshCookie = setAuthCookie(result.refreshToken);
 
-  const response = new NextResponse(
+  return new NextResponse(
     JSON.stringify({
       user: {
         id: result.user.id,
@@ -25,15 +27,14 @@ export async function POST(req: NextRequest) {
         name: result.user.name,
         role: result.user.role?.name,
       },
+      accessToken,
     }),
     {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
+        'Set-Cookie': refreshCookie,
       },
     }
   );
-  response.headers.append('Set-Cookie', accessCookie);
-  response.headers.append('Set-Cookie', refreshCookie);
-  return response;
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { registerUser } from '@/lib/auth';
-import { setAuthCookies } from '@/lib/cookies';
+import { setAuthCookie } from '@/lib/cookies';
 
 export async function POST(req: NextRequest) {
   const { email, password, name } = await req.json();
@@ -15,9 +15,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'User already exists' }, { status: 409 });
   }
 
-  const [accessCookie, refreshCookie] = setAuthCookies(result.accessToken, result.refreshToken);
+  const refreshCookie = setAuthCookie(result.refreshToken);
 
-  const res = new NextResponse(
+  return new NextResponse(
     JSON.stringify({
       user: {
         id: result.user.id,
@@ -25,13 +25,11 @@ export async function POST(req: NextRequest) {
         name: result.user.name,
         role: result.user.role?.name,
       },
+      accessToken: result.accessToken,
     }),
     {
       status: 201,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Set-Cookie': refreshCookie },
     }
   );
-  res.headers.append('Set-Cookie', accessCookie);
-  res.headers.append('Set-Cookie', refreshCookie);
-  return res;
 }
