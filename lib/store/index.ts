@@ -1,10 +1,10 @@
 import { configureStore, ThunkAction, UnknownAction } from '@reduxjs/toolkit';
-import userReducer from './user';
+import authReducer from './auth';
 import githubReducer from './github';
 
 const store = configureStore({
   reducer: {
-    user: userReducer,
+    auth: authReducer,
     github: githubReducer,
   },
 });
