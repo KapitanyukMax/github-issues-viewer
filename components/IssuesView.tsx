@@ -1,14 +1,16 @@
 'use client';
-
 import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import { AppDispatch, RootState } from '@/lib/store';
+import { updateIssueStatus } from '@/lib/store/github';
 import IssuesGroup from './IssuesGroup';
 import { IssueStatus } from '@/app/types/github';
-import { useGitHub } from '@/app/context/GitHubContext';
 import IssueView from './IssueView';
 
 export default function IssuesView() {
-  const { repoInfo, updateRepoInfo } = useGitHub();
+  const dispatch = useDispatch<AppDispatch>();
+  const repoInfo = useSelector((state: RootState) => state.github.repoInfo);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   let draggedIssue;
 
@@ -24,8 +26,7 @@ export default function IssuesView() {
     );
     if (index === -1) return;
 
-    repoInfo.issues[index].status = over?.id as IssueStatus;
-    updateRepoInfo(repoInfo.owner, repoInfo.repo, repoInfo);
+    dispatch(updateIssueStatus(index, over?.id as IssueStatus));
     setDraggedId(null);
   }
 

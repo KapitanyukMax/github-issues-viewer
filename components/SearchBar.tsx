@@ -1,12 +1,14 @@
 'use client';
 import { ChangeEvent, useState, useEffect } from 'react';
-import { useGitHub } from '@/app/context/GitHubContext';
+import { useDispatch } from 'react-redux';
+import { loadRepoInfo, clearRepoInfo } from '@/lib/store/github';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { isValidGitHubRepoUrl, parseGitHubRepoUrl } from '@/app/utils/githubUrls';
+import { AppDispatch } from '@/lib/store';
 
 export default function SearchBar() {
-  const { loadRepoInfo, unloadRepoInfo } = useGitHub();
+  const dispatch = useDispatch<AppDispatch>();
   const [error, setError] = useState<string | null>(null);
   const [url, setUrl] = useState('');
 
@@ -14,9 +16,17 @@ export default function SearchBar() {
     const savedUrl = sessionStorage.getItem('url');
     if (!savedUrl) return;
 
+    if (!isValidGitHubRepoUrl(savedUrl)) {
+      setUrl('');
+      setError(null);
+      return;
+    }
+
     setUrl(savedUrl);
+    sessionStorage.setItem('url', savedUrl);
+
     const { owner, repo } = parseGitHubRepoUrl(savedUrl);
-    loadRepoInfo(owner, repo, false);
+    dispatch(loadRepoInfo(owner, repo, false));
   }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -29,7 +39,7 @@ export default function SearchBar() {
 
   const handleClick = async () => {
     if (!url || url.trim() === '') {
-      unloadRepoInfo();
+      dispatch(clearRepoInfo());
       return;
     } else if (!isValidGitHubRepoUrl(url)) {
       setError('This must be a valid GitHub repo URL');
@@ -41,7 +51,7 @@ export default function SearchBar() {
 
     const { owner, repo } = parseGitHubRepoUrl(url);
 
-    await loadRepoInfo(owner, repo, false);
+    dispatch(loadRepoInfo(owner, repo, false));
   };
 
   return (

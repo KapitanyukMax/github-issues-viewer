@@ -1,4 +1,10 @@
-import { GitHubIssue, IssueInfo, RepoInfo } from '../types/github';
+import { GitHubIssue, IssueInfo, IssueStatus, RepoInfo } from '../types/github';
+
+export interface LoadRepoInfoParams {
+  owner: string;
+  repo: string;
+  loadMore: boolean;
+}
 
 function formatNumber(n: number): string {
   if (n < 1000) return n.toString();
@@ -111,7 +117,6 @@ async function fetchRepoStars(owner: string, repo: string): Promise<string> {
     },
   });
   const data = (await response.json()) as { stargazers_count: number };
-  console.log(data);
 
   return formatNumber(data.stargazers_count);
 }
@@ -142,4 +147,17 @@ async function getRepoInfo(owner: string, repo: string, loadMore: boolean): Prom
   return repoInfo;
 }
 
-export { getCacheKey, getRepoInfo, getIssueStateInfo };
+function updateIssueStatusCache(
+  owner: string,
+  repo: string,
+  issueIndex: number,
+  issueStatus: IssueStatus
+) {
+  const cache = loadFromCache(owner, repo);
+  if (!cache) return;
+
+  cache.issues[issueIndex].status = issueStatus;
+  localStorage.setItem(getCacheKey(owner, repo), JSON.stringify(cache));
+}
+
+export { getCacheKey, getRepoInfo, getIssueStateInfo, updateIssueStatusCache };

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { GitHubProvider } from './context/GitHubContext';
+import StoreProvider from '@/components/StoreProvider';
 import './globals.css';
 
 const geistSans = Geist({
@@ -28,7 +28,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full md:h-screen flex flex-col`}
       >
-        <GitHubProvider>{children}</GitHubProvider>
+        <StoreProvider>{children}</StoreProvider>
       </body>
     </html>
   );

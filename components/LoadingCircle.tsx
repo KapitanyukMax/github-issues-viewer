@@ -1,5 +1,4 @@
 'use client';
-
 export default function LoadingCircle() {
   return (
     <div className="flex justify-center items-center">

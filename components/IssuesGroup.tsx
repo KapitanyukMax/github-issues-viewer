@@ -1,9 +1,12 @@
+'use client';
 import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useDroppable } from '@dnd-kit/core';
 import { cn } from '@/lib/utils';
-import { useGitHub } from '@/app/context/GitHubContext';
+import { loadRepoInfo } from '@/lib/store/github';
 import IssueView from './IssueView';
 import LoadingCircle from './LoadingCircle';
+import { AppDispatch, RootState } from '@/lib/store';
 
 interface IssuesGroupProps {
   issueStatus: string;
@@ -11,7 +14,9 @@ interface IssuesGroupProps {
 }
 
 export default function IssuesGroup({ issueStatus, loadable }: IssuesGroupProps) {
-  const { repoInfo, loading, loadRepoInfo } = useGitHub();
+  const { repoInfo, loading } = useSelector((state: RootState) => state.github);
+  const dispatch = useDispatch<AppDispatch>();
+
   const filteredIssues = repoInfo?.issues.filter(issue => issue.status === issueStatus);
   const { isOver, setNodeRef } = useDroppable({ id: issueStatus });
 
@@ -22,7 +27,7 @@ export default function IssuesGroup({ issueStatus, loadable }: IssuesGroupProps)
     const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 500;
 
     if (nearBottom && repoInfo) {
-      loadRepoInfo(repoInfo.owner, repoInfo.repo, true);
+      dispatch(loadRepoInfo(repoInfo.owner, repoInfo.repo, true));
     }
   };
 
