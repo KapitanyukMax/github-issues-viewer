@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IssueStatus, RepoInfo } from '@/app/types/github';
-import { getRepoInfo, updateIssueStatusCache } from '@/app/utils/repoInfo';
+import { IssueStatus, RepoInfo } from '@/types/ui/github';
+import { getRepoInfo, updateIssueStatusCache } from '@/utils/repoInfo';
 import { AppThunk, AppDispatch, RootState } from '.';
 
 export interface GitHubState {

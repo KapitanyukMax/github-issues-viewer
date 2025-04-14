@@ -1,29 +1,43 @@
-import { serialize, parse } from 'cookie';
+import { cookies } from 'next/headers';
+import { Tokens } from './tokens.types';
 
-export const REFRESH_TOKEN_COOKIE = 'refresh_token';
+const ACCESS_TOKEN_COOKIE = 'access_token';
+const REFRESH_TOKEN_COOKIE = 'refresh_token';
 
-export function setAuthCookie(refreshToken: string) {
-  const refresh = serialize(REFRESH_TOKEN_COOKIE, refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7,
-  });
+export async function setAuthCookies(tokens: Tokens) {
+  const cookieStore = await cookies();
 
-  return refresh;
+  if (tokens.accessToken) {
+    cookieStore.set(ACCESS_TOKEN_COOKIE, tokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 15,
+    });
+  }
+
+  if (tokens.refreshToken) {
+    cookieStore.set(REFRESH_TOKEN_COOKIE, tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    });
+  }
 }
 
-export function clearAuthCookie() {
-  const refresh = serialize(REFRESH_TOKEN_COOKIE, '', {
-    path: '/',
-    maxAge: 0,
-  });
+export async function clearAuthCookies() {
+  const cookieStore = await cookies();
 
-  return refresh;
+  cookieStore.delete(ACCESS_TOKEN_COOKIE);
+  cookieStore.delete(REFRESH_TOKEN_COOKIE);
 }
 
-export function getCookiesFromRequest(req: Request): Record<string, string | undefined> {
-  const cookieHeader = req.headers.get('cookie') || '';
-  return parse(cookieHeader);
+export async function getTokensFromCookies(): Promise<Tokens> {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value ?? null;
+  const refreshToken = cookieStore.get(REFRESH_TOKEN_COOKIE)?.value ?? null;
+  return { accessToken, refreshToken };
 }

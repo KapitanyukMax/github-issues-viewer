@@ -1,4 +1,4 @@
-import { GitHubIssue, IssueInfo, IssueStatus, RepoInfo } from '../types/github';
+import { GitHubIssue, IssueInfo, IssueStatus, RepoInfo } from '../types/ui/github';
 
 export interface LoadRepoInfoParams {
   owner: string;

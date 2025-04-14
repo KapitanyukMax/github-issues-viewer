@@ -5,7 +5,7 @@ export interface User {
   role?: string;
 }
 
-export interface AuthState {
-  user: User | null;
-  accessToken: string | null;
+export interface AuthResponse {
+  user: User;
+  accessToken: string;
 }

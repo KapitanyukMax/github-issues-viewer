@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { IssueInfo } from '@/app/types/github';
-import { getIssueStateInfo } from '@/app/utils/repoInfo';
+import { IssueInfo } from '@/types/ui/github';
+import { getIssueStateInfo } from '@/utils/repoInfo';
 
 interface IssueViewProps {
   issue: IssueInfo;

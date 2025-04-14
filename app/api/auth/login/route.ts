@@ -1,38 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { loginUser } from '@/lib/auth';
-import { setAuthCookie } from '@/lib/cookies';
+import { headers } from 'next/headers';
+import { setAuthCookies } from '@/lib/cookies';
+import { LoginDto } from '@/types/dto/auth/LoginDto';
+import { validateLoginDto } from '@/lib/validation/login';
+import { login } from '@/app/services/auth/login';
 
 export async function POST(req: NextRequest) {
-  const { email, password } = await req.json();
-
-  if (!email || !password) {
-    return NextResponse.json({ error: 'Missing credentials' }, { status: 400 });
+  const user: LoginDto = await req.json();
+  const validationResult = validateLoginDto(user);
+  if (validationResult !== 'valid') {
+    return NextResponse.json(
+      { error: `Bad request - ${validationResult}` },
+      {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   }
 
-  const result = await loginUser(email, password);
+  try {
+    const result = await login(user);
+    await setAuthCookies(result.tokens);
 
-  if (!result) {
-    return NextResponse.json({ error: 'Invalid username or password' }, { status: 401 });
+    return NextResponse.json(
+      { data: result.userInfo },
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { error },
+      {
+        status: 401,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   }
-
-  const refreshCookie = setAuthCookie(result.refreshToken);
-
-  return new NextResponse(
-    JSON.stringify({
-      user: {
-        id: result.user.id,
-        email: result.user.email,
-        name: result.user.name,
-        role: result.user.role?.name,
-      },
-      accessToken: result.accessToken,
-    }),
-    {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Set-Cookie': refreshCookie,
-      },
-    }
-  );
 }

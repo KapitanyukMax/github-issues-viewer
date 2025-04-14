@@ -1,11 +1,11 @@
 'use client';
 import { ChangeEvent, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { loadRepoInfo, clearRepoInfo } from '@/lib/store/github';
+import { loadRepoInfo, clearRepoInfo } from '@/store/github';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { isValidGitHubRepoUrl, parseGitHubRepoUrl } from '@/app/utils/githubUrls';
-import { AppDispatch } from '@/lib/store';
+import { isValidGitHubRepoUrl, parseGitHubRepoUrl } from '@/utils/githubUrls';
+import { AppDispatch } from '@/store';
 
 export default function SearchBar() {
   const dispatch = useDispatch<AppDispatch>();

@@ -1,18 +1,22 @@
 'use client';
 import { useSelector } from 'react-redux';
-import store, { RootState } from '../lib/store';
+import { useAuth } from '@/hooks/useAuth';
+import { RootState } from '../store';
+import Header from '@/components/Header';
 import SearchBar from '@/components/SearchBar';
 import NavBar from '@/components/NavBar';
-import IssuesView from '@/components/IssuesView';
+import IssuesView from '@/components/Issues/IssuesView';
 
 export default function Home() {
+  useAuth();
   const repoInfo = useSelector((state: RootState) => state.github.repoInfo);
 
   return (
     <>
-      <header>
+      <Header />
+      <div>
         <SearchBar />
-      </header>
+      </div>
       {repoInfo && <NavBar {...repoInfo} />}
       <main className="flex-1 flex overflow-hidden">
         <IssuesView />

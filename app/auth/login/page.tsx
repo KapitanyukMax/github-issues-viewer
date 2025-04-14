@@ -1,20 +1,21 @@
 'use client';
 import { MouseEvent, ChangeEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
-import { isValidEmail, isValidPassword } from '@/app/utils/validation';
+import { isValidEmail } from '@/utils/validation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { AppDispatch } from '@/lib/store';
-import { setAuthorized } from '@/lib/store/auth';
-import { login } from '@/app/utils/auth';
+import { login } from '@/utils/auth';
+import { AppDispatch } from '@/store';
+import { setAuth } from '@/store/auth';
 
 export default function Login() {
+  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
   const [password, setPassword] = useState('');
-  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [loginError, setLoginError] = useState<string | null>(null);
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -34,32 +35,21 @@ export default function Login() {
       setLoginError(null);
     }
 
-    if (passwordError) {
-      setPasswordError(null);
-    }
-
     setPassword(e.target.value);
   };
 
   const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    if (!isValidEmail) {
+    if (!isValidEmail(email)) {
       setEmailError('Invalid email address');
       return;
     }
 
-    if (!isValidPassword) {
-      setPasswordError(
-        'Password must be at least 8 characters length and include at least ' +
-          '1 lowercase, 1 uppercase, 1 number, and 1 special character'
-      );
-      return;
-    }
-
     try {
-      const authState = await login(email, password);
-      dispatch(setAuthorized(authState));
+      const { user, accessToken } = await login(email, password);
+      dispatch(setAuth(user, accessToken));
+      router.push('/');
     } catch (error) {
       let message = 'Unknown authentication error';
       if (error instanceof Error) {
@@ -68,6 +58,12 @@ export default function Login() {
       setLoginError(`Login failed: ${message}`);
       return;
     }
+  };
+
+  const moveToRegister = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    router.push('/auth/register');
   };
 
   return (
@@ -95,12 +91,20 @@ export default function Login() {
           type="password"
           placeholder="Enter password..."
           value={password}
-          error={passwordError}
+          error={null}
           onChange={handlePasswordChange}
         />
       </div>
 
-      <Button onClick={handleSubmit}>Log In</Button>
+      <Button onClick={handleSubmit} className="hover:cursor-pointer">
+        Log In
+      </Button>
+
+      <p className="self-center w-fit">
+        <Button variant="link" onClick={moveToRegister}>
+          Register
+        </Button>
+      </p>
     </div>
   );
 }

@@ -1,27 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { refreshSession } from '@/lib/auth';
-import { getCookiesFromRequest, setAuthCookie } from '@/lib/cookies';
+import { getTokensFromCookies, setAuthCookies } from '@/lib/cookies';
+import { refresh } from '@/app/services/auth/refresh';
 
 export async function POST(req: NextRequest) {
-  const cookies = getCookiesFromRequest(req);
-  const refreshToken = cookies.refresh_token;
+  const tokens = await getTokensFromCookies();
 
-  if (!refreshToken) {
-    return NextResponse.json({ error: 'No refresh token' }, { status: 401 });
+  if (!tokens.refreshToken) {
+    return NextResponse.json(
+      { error: 'No refresh token' },
+      {
+        status: 401,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   }
 
   try {
-    const { accessToken, refreshToken: newRefreshToken } = await refreshSession(refreshToken);
+    const newTokens = await refresh(tokens.refreshToken);
+    await setAuthCookies(newTokens);
 
-    const refreshCookie = setAuthCookie(newRefreshToken);
-
-    return new NextResponse(JSON.stringify({ accessToken }), {
-      status: 204,
-      headers: {
-        'Set-Cookie': refreshCookie,
-      },
-    });
-  } catch {
-    return NextResponse.json({ error: 'Invalid refresh token' }, { status: 403 });
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    return NextResponse.json(
+      { error },
+      {
+        status: 403,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   }
 }

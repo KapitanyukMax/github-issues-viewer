@@ -1,35 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { registerUser } from '@/lib/auth';
-import { setAuthCookie } from '@/lib/cookies';
+import { setAuthCookies } from '@/lib/cookies';
+import { RegisterDto } from '@/types/dto/auth/RegisterDto';
+import { validateRegisterDto } from '@/lib/validation/registation';
+import { register } from '@/app/services/auth/register';
 
 export async function POST(req: NextRequest) {
-  const { email, password, name } = await req.json();
-
-  if (!email || !password || !name) {
-    return NextResponse.json({ error: 'Missing credentials' }, { status: 400 });
+  const user: RegisterDto = await req.json();
+  const validationResult = validateRegisterDto(user);
+  if (validationResult !== 'valid') {
+    return NextResponse.json(
+      { error: `Bad request - ${validationResult}` },
+      {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   }
 
-  const result = await registerUser(email, password, name);
+  try {
+    const result = await register(user);
+    await setAuthCookies(result.tokens);
 
-  if (!result) {
-    return NextResponse.json({ error: 'User already exists' }, { status: 409 });
+    return NextResponse.json(
+      { data: result.userInfo },
+      {
+        status: 201,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { error },
+      { status: 409, headers: { 'Content-Type': 'application/json' } }
+    );
   }
-
-  const refreshCookie = setAuthCookie(result.refreshToken);
-
-  return new NextResponse(
-    JSON.stringify({
-      user: {
-        id: result.user.id,
-        email: result.user.email,
-        name: result.user.name,
-        role: result.user.role?.name,
-      },
-      accessToken: result.accessToken,
-    }),
-    {
-      status: 201,
-      headers: { 'Content-Type': 'application/json', 'Set-Cookie': refreshCookie },
-    }
-  );
 }

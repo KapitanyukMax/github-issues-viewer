@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
-import { AppDispatch, RootState } from '@/lib/store';
-import { updateIssueStatus } from '@/lib/store/github';
+import { AppDispatch, RootState } from '@/store';
+import { updateIssueStatus } from '@/store/github';
 import IssuesGroup from './IssuesGroup';
-import { IssueStatus } from '@/app/types/github';
+import { IssueStatus } from '@/types/ui/github';
 import IssueView from './IssueView';
 
 export default function IssuesView() {
