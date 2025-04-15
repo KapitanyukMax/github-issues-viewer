@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTokensFromCookies, setAuthCookies } from '@/lib/cookies';
-import { refresh } from '@/app/services/auth/refresh';
+import { getTokensFromCookies, setAuthCookies } from '@/lib/helpers/cookies';
+import { refresh } from '@/services/auth/authService';
 
 export async function POST(req: NextRequest) {
   const tokens = await getTokensFromCookies();
@@ -23,8 +23,15 @@ export async function POST(req: NextRequest) {
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'string'
+          ? error
+          : 'Unknown registration error';
+
     return NextResponse.json(
-      { error },
+      { error: errorMessage },
       {
         status: 403,
         headers: {

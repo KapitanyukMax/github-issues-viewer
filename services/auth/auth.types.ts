@@ -1,4 +1,4 @@
-import { Tokens } from '@/lib/tokens.types';
+import { Tokens } from '@/lib/helpers/tokens.types';
 
 export interface UserInfo {
   id: number;

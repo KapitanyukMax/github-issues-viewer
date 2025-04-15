@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { setAuthCookies } from '@/lib/cookies';
+import { setAuthCookies } from '@/lib/helpers/cookies';
 import { RegisterDto } from '@/types/dto/auth/RegisterDto';
 import { validateRegisterDto } from '@/lib/validation/registation';
-import { register } from '@/app/services/auth/register';
+import { register } from '@/services/auth/authService';
 
 export async function POST(req: NextRequest) {
   const user: RegisterDto = await req.json();
@@ -31,8 +31,15 @@ export async function POST(req: NextRequest) {
       }
     );
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'string'
+          ? error
+          : 'Unknown registration error';
+
     return NextResponse.json(
-      { error },
+      { error: errorMessage },
       { status: 409, headers: { 'Content-Type': 'application/json' } }
     );
   }
