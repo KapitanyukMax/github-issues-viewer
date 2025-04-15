@@ -15,20 +15,20 @@ export function isRegisterDto(user: RegisterDto): user is RegisterDto {
 
 export function validateRegisterDto(user: RegisterDto) {
   if (!isRegisterDto(user)) {
-    return 'missing credentials';
+    return 'Missing credentials';
   }
 
   if (!isValidEmail(user.email)) {
-    return 'invalid email';
+    return 'Invalid email';
   }
 
   if (!isStrongPassword(user.password)) {
-    return 'week password';
+    return 'Week password';
   }
 
   if (user.name.length < 2 || user.name.length > 100) {
-    return 'invalid name';
+    return 'Invalid name';
   }
 
-  return 'valid';
+  return 'Valid';
 }

@@ -1,6 +1,6 @@
 import { configureStore, ThunkAction, UnknownAction } from '@reduxjs/toolkit';
-import authReducer from './auth';
-import githubReducer from './github';
+import authReducer from './authSlice';
+import githubReducer from './githubSlice';
 
 const store = configureStore({
   reducer: {

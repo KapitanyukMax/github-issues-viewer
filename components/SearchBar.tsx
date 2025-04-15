@@ -1,7 +1,7 @@
 'use client';
 import { ChangeEvent, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { loadRepoInfo, clearRepoInfo } from '@/store/github';
+import { loadRepoInfo, clearRepoInfo } from '@/store/githubSlice';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { isValidGitHubRepoUrl, parseGitHubRepoUrl } from '@/utils/githubUrls';

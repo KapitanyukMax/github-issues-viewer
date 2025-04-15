@@ -3,11 +3,12 @@ import { setAuthCookies } from '@/lib/helpers/cookies';
 import { LoginDto } from '@/types/dto/auth/LoginDto';
 import { validateLoginDto } from '@/lib/validation/login';
 import { login } from '@/services/auth/authService';
+import { getErrorMessage } from '@/lib/helpers/errors';
 
 export async function POST(req: NextRequest) {
   const user: LoginDto = await req.json();
   const validationResult = validateLoginDto(user);
-  if (validationResult !== 'valid') {
+  if (validationResult !== 'Valid') {
     return NextResponse.json(
       { error: `Bad request - ${validationResult}` },
       {
@@ -33,15 +34,8 @@ export async function POST(req: NextRequest) {
       }
     );
   } catch (error) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : typeof error === 'string'
-          ? error
-          : 'Unknown registration error';
-
     return NextResponse.json(
-      { error: errorMessage },
+      { error: getErrorMessage(error) },
       {
         status: 401,
         headers: {

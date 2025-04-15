@@ -1,11 +1,5 @@
 import { Tokens } from '@/lib/helpers/tokens.types';
-
-export interface UserInfo {
-  id: number;
-  email: string;
-  name: string | null;
-  role: string | null;
-}
+import { UserInfo } from '@/types/shared/UserInfo';
 
 export interface SignInResult {
   tokens: Tokens;

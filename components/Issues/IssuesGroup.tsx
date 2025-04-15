@@ -3,8 +3,8 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useDroppable } from '@dnd-kit/core';
 import { cn } from '@/lib/utils';
-import { loadRepoInfo } from '@/store/github';
-import IssueView from '../IssueView';
+import { loadRepoInfo } from '@/store/githubSlice';
+import IssueView from './IssueView';
 import LoadingCircle from '../LoadingCircle';
 import { AppDispatch, RootState } from '@/store';
 

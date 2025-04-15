@@ -11,6 +11,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="flex flex-col space-y-1 w-full">
         <input
+          ref={ref}
           type={type}
           data-slot="input"
           className={cn(

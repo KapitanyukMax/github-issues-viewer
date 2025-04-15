@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { setAuthCookies } from '@/lib/helpers/cookies';
 import { RegisterDto } from '@/types/dto/auth/RegisterDto';
-import { validateRegisterDto } from '@/lib/validation/registation';
+import { validateRegisterDto } from '@/lib/validation/register';
 import { register } from '@/services/auth/authService';
+import { getErrorMessage } from '@/lib/helpers/errors';
 
 export async function POST(req: NextRequest) {
   const user: RegisterDto = await req.json();
   const validationResult = validateRegisterDto(user);
-  if (validationResult !== 'valid') {
+  if (validationResult !== 'Valid') {
     return NextResponse.json(
       { error: `Bad request - ${validationResult}` },
       {
@@ -31,15 +32,8 @@ export async function POST(req: NextRequest) {
       }
     );
   } catch (error) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : typeof error === 'string'
-          ? error
-          : 'Unknown registration error';
-
     return NextResponse.json(
-      { error: errorMessage },
+      { error: getErrorMessage(error) },
       { status: 409, headers: { 'Content-Type': 'application/json' } }
     );
   }

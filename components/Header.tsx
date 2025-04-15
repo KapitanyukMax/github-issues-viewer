@@ -3,21 +3,22 @@ import { MouseEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button } from './ui/button';
+import LoadingCircle from './LoadingCircle';
+import ProfileInfo from './ProfileInfo';
 import { RootState } from '@/store';
-import { logout } from '@/utils/auth';
 import { AppDispatch } from '@/store';
-import { clearAuth } from '@/store/auth';
+import { logout } from '@/store/authSlice';
+import { cn } from '@/lib/utils';
 
 export default function Header() {
   const dispatch = useDispatch<AppDispatch>();
-  const user = useSelector((state: RootState) => state.auth.user);
+  const { user, loading } = useSelector((state: RootState) => state.auth);
   const router = useRouter();
 
   const handleLogoutClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    await logout();
-    dispatch(clearAuth);
+    dispatch(logout());
   };
 
   const handleLoginClick = (e: MouseEvent<HTMLButtonElement>) => {
@@ -32,16 +33,23 @@ export default function Header() {
     router.push('/auth/register');
   };
 
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
+  if (loading)
+    return (
+      <menu className="flex flex-row justify-start items-center gap-4 pb-4">
+        <LoadingCircle />
+        <p className="font-semibold">Loading...</p>
+      </menu>
+    );
 
   return (
-    <menu className="flex flex-row justify-end gap-4 pb-4">
+    <menu className={cn('flex flex-row gap-4 pb-4', user ? 'justify-between' : 'justify-end')}>
       {user ? (
-        <Button variant="outline" onClick={handleLogoutClick}>
-          Log Out
-        </Button>
+        <>
+          <ProfileInfo user={user} />
+          <Button variant="outline" onClick={handleLogoutClick}>
+            Log Out
+          </Button>
+        </>
       ) : (
         <>
           <Button variant="default" onClick={handleLoginClick}>

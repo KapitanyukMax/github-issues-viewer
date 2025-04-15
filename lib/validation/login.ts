@@ -11,12 +11,12 @@ export function isLoginDto(user: LoginDto): user is LoginDto {
 
 export function validateLoginDto(user: LoginDto) {
   if (!isLoginDto(user)) {
-    return 'missing credentials';
+    return 'Missing credentials';
   }
 
   if (!isValidEmail(user.email)) {
-    return 'invalid email';
+    return 'Invalid email';
   }
 
-  return 'valid';
+  return 'Valid';
 }
