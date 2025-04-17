@@ -2,13 +2,13 @@
 import { useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 
-interface NavBarProps {
+export interface NavBarProps {
   owner: string;
   repo: string;
   stars: string;
 }
 
-export default function NavBar({ owner, repo, stars }: NavBarProps) {
+export function NavBar({ owner, repo, stars }: NavBarProps) {
   const ownerUrl = `https://github.com/${owner}`;
   const repoUrl = `https://github.com/${owner}/${repo}`;
 

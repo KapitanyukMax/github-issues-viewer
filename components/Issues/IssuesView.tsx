@@ -4,11 +4,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { DndContext, DragOverlay, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import { AppDispatch, RootState } from '@/store';
 import { updateIssueStatus } from '@/store/githubSlice';
-import IssuesGroup from './IssuesGroup';
+import { IssuesGroup } from './IssuesGroup';
 import { IssueStatus } from '@/types/ui/github';
-import IssueView from './IssueView';
+import { IssueView } from './IssueView';
 
-export default function IssuesView() {
+export function IssuesView() {
   const dispatch = useDispatch<AppDispatch>();
   const repoInfo = useSelector((state: RootState) => state.github.repoInfo);
   const [draggedId, setDraggedId] = useState<string | null>(null);

@@ -3,11 +3,11 @@ import { ChangeEvent, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { loadRepoInfo, clearRepoInfo } from '@/store/githubSlice';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { isValidGitHubRepoUrl, parseGitHubRepoUrl } from '@/utils/githubUrls';
 import { AppDispatch } from '@/store';
+import { ValidatedInput } from './Forms/ValidatedInput';
 
-export default function SearchBar() {
+export function SearchBar() {
   const dispatch = useDispatch<AppDispatch>();
   const [error, setError] = useState<string | null>(null);
   const [url, setUrl] = useState('');
@@ -27,7 +27,7 @@ export default function SearchBar() {
 
     const { owner, repo } = parseGitHubRepoUrl(savedUrl);
     dispatch(loadRepoInfo(owner, repo, false));
-  }, []);
+  }, [dispatch]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUrl(e.target.value);
@@ -56,7 +56,7 @@ export default function SearchBar() {
 
   return (
     <div className="flex gap-4">
-      <Input
+      <ValidatedInput
         type="url"
         placeholder="Enter repo URL"
         value={url}

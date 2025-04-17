@@ -1,4 +1,4 @@
-import { LoginDto } from '@/types/dto/auth/LoginDto';
+import { LoginDto } from '@/types/shared/dto/auth/LoginDto';
 import { isValidEmail } from './auth';
 
 export function isLoginDto(user: LoginDto): user is LoginDto {

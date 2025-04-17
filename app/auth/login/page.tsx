@@ -1,132 +1,73 @@
 'use client';
-import { MouseEvent, ChangeEvent, useState, useEffect } from 'react';
+import { Formik, Form } from 'formik';
+import * as Yup from 'yup';
+import { InputControl } from '@/components/Forms/InputControl';
+import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { cn } from '@/lib/utils';
-import { Input } from '@/components/ui/input';
-import { PasswordInput } from '@/components/ui/passwordInput';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { AppDispatch, RootState } from '@/store';
-import { login, clearError } from '@/store/authSlice';
-import { getBadRequestErrorMessage, isEmailError } from '@/utils/errors';
+import { AppDispatch } from '@/store';
+import { login, selectUser } from '@/store/authSlice';
+import { useEffect } from 'react';
+
+interface LoginFormValues {
+  email: string;
+  password: string;
+}
 
 export default function Login() {
-  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState<string | null>(null);
-  const [password, setPassword] = useState('');
-  const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [loginError, setLoginError] = useState<string | null>(null);
-  const { user, error } = useSelector((state: RootState) => state.auth);
+  const user = useSelector(selectUser);
+  const router = useRouter();
 
   useEffect(() => {
     if (user) {
       router.push('/');
     }
-  }, [user]);
+  }, [router, user]);
 
-  useEffect(() => {
-    if (!error) return;
-
-    if (isEmailError(error)) {
-      setEmailError('Invalid email address');
-      return;
-    }
-    setLoginError(getBadRequestErrorMessage(error));
-  }, [error]);
-
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-
-    if (loginError) {
-      setLoginError(null);
-    }
-    if (emailError) {
-      setEmailError(null);
-    }
-  };
-
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-
-    if (loginError) {
-      setLoginError(null);
-    }
-    if (passwordError) {
-      setPasswordError(null);
-    }
-  };
-
-  const handleSubmit = async (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-
-    let isError = false;
-    if (email.trim().length === 0) {
-      setEmailError('Enter email address');
-      isError = true;
-    }
-    if (password.trim().length === 0) {
-      setPasswordError('Enter password');
-      isError = true;
-    }
-    if (isError) return;
-
-    if (error) {
-      dispatch(clearError());
-    }
-    dispatch(login(email, password));
-  };
-
-  const forwardToRegister = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-
-    router.push('/auth/register');
+  const handleSubmit = async (values: LoginFormValues) => {
+    await dispatch(login(values));
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-center items-stretch md:w-xl gap-8">
-      <h2 className="text-2xl font-bold">Log In</h2>
+    <Formik
+      initialValues={{ email: '', password: '' }}
+      validationSchema={Yup.object({
+        email: Yup.string().email('Invalid email address').required('Email is equired'),
+        password: Yup.string()
+          .min(8, 'Password must be at least 8 characters long')
+          .required('Password is required'),
+      })}
+      onSubmit={handleSubmit}
+    >
+      <Form className="flex-1 flex flex-col justify-center items-stretch md:w-xl gap-8">
+        <h2 className="text-2xl font-bold">Log In</h2>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="email-input" className={cn(emailError && 'text-red-500')}>
-          Email
-        </Label>
-        <Input
-          id="email-input"
+        <InputControl
+          id="email"
+          name="email"
+          label="Email"
           type="email"
-          placeholder="Enter email..."
-          value={email}
-          error={emailError}
-          onChange={handleEmailChange}
+          placeholder="Enter email"
         />
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="password-input" className={cn(passwordError && 'text-red-500')}>
-          Password
-        </Label>
-        <PasswordInput
-          id="password-input"
-          placeholder="Enter password..."
-          value={password}
-          error={passwordError}
-          onChange={handlePasswordChange}
+        <InputControl
+          id="password"
+          name="password"
+          label="Password"
+          type="password"
+          placeholder="Enter password"
         />
-      </div>
 
-      {loginError && <p className="text-red-500">{loginError}</p>}
-
-      <Button onClick={handleSubmit} className="hover:cursor-pointer">
-        Log In
-      </Button>
-
-      <p className="self-center w-fit">
-        <Button variant="link" onClick={forwardToRegister}>
+        <Button type="submit">Login</Button>
+        <Button
+          type="button"
+          variant="link"
+          onClick={() => router.push('/auth/register')}
+          className="self-center"
+        >
           Register
         </Button>
-      </p>
-    </div>
+      </Form>
+    </Formik>
   );
 }

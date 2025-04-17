@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getTokensFromCookies, clearAuthCookies } from '@/lib/helpers/cookies';
 import { logout } from '@/services/auth/authService';
 import { getErrorMessage } from '@/lib/helpers/errors';

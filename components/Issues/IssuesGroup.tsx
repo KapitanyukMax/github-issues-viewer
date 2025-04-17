@@ -4,8 +4,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useDroppable } from '@dnd-kit/core';
 import { cn } from '@/lib/utils';
 import { loadRepoInfo } from '@/store/githubSlice';
-import IssueView from './IssueView';
-import LoadingCircle from '../LoadingCircle';
+import { IssueView } from './IssueView';
+import { LoadingCircle } from '../LoadingCircle';
 import { AppDispatch, RootState } from '@/store';
 
 interface IssuesGroupProps {
@@ -13,7 +13,7 @@ interface IssuesGroupProps {
   loadable?: boolean;
 }
 
-export default function IssuesGroup({ issueStatus, loadable }: IssuesGroupProps) {
+export function IssuesGroup({ issueStatus, loadable }: IssuesGroupProps) {
   const { repoInfo, loading } = useSelector((state: RootState) => state.github);
   const dispatch = useDispatch<AppDispatch>();
 

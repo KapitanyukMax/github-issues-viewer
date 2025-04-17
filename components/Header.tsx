@@ -1,24 +1,24 @@
 'use client';
-import { MouseEvent, useEffect } from 'react';
+import { MouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button } from './ui/button';
-import LoadingCircle from './LoadingCircle';
-import ProfileInfo from './ProfileInfo';
-import { RootState } from '@/store';
+import { LoadingCircle } from './LoadingCircle';
+import { ProfileInfo } from './ProfileInfo';
 import { AppDispatch } from '@/store';
-import { logout } from '@/store/authSlice';
+import { logout, selectAuthStatus, selectUser } from '@/store/authSlice';
 import { cn } from '@/lib/utils';
 
-export default function Header() {
+export function Header() {
   const dispatch = useDispatch<AppDispatch>();
-  const { user, loading } = useSelector((state: RootState) => state.auth);
+  const user = useSelector(selectUser);
+  const authStatus = useSelector(selectAuthStatus);
   const router = useRouter();
 
   const handleLogoutClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    dispatch(logout());
+    await dispatch(logout());
   };
 
   const handleLoginClick = (e: MouseEvent<HTMLButtonElement>) => {
@@ -33,7 +33,7 @@ export default function Header() {
     router.push('/auth/register');
   };
 
-  if (loading)
+  if (authStatus === 'loading')
     return (
       <menu className="flex flex-row justify-start items-center gap-4 pb-4">
         <LoadingCircle />

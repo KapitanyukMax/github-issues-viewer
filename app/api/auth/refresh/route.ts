@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getTokensFromCookies, setAuthCookies } from '@/lib/helpers/cookies';
 import { refresh } from '@/services/auth/authService';
 import { getErrorMessage } from '@/lib/helpers/errors';
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   const tokens = await getTokensFromCookies();
 
   if (!tokens.refreshToken) {

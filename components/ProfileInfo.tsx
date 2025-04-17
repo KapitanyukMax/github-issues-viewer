@@ -4,6 +4,6 @@ export interface ProfileInfoProps {
   user: UserInfo;
 }
 
-export default function ProfileInfo({ user }: ProfileInfoProps) {
+export function ProfileInfo({ user }: ProfileInfoProps) {
   return <p className="font-semibold">{user.name}</p>;
 }

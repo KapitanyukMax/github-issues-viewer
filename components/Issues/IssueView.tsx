@@ -8,7 +8,7 @@ interface IssueViewProps {
   issue: IssueInfo;
 }
 
-export default function IssueView({ issue }: IssueViewProps) {
+export function IssueView({ issue }: IssueViewProps) {
   const { attributes, listeners, isDragging, setNodeRef } = useDraggable({
     id: issue.number.toString(),
   });

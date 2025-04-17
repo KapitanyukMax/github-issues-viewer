@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { setAuthCookies } from '@/lib/helpers/cookies';
-import { RegisterDto } from '@/types/dto/auth/RegisterDto';
+import { RegisterDto } from '@/types/shared/dto/auth/RegisterDto';
 import { validateRegisterDto } from '@/lib/validation/register';
 import { register } from '@/services/auth/authService';
 import { getErrorMessage } from '@/lib/helpers/errors';

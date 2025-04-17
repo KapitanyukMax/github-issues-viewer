@@ -1,6 +1,6 @@
 import { hashPassword, verifyPassword } from '@/lib/helpers/hashing';
 import { createUser, getUserByEmail, getUserById } from '@/repositories/userRepository';
-import { LoginDto } from '@/types/dto/auth/LoginDto';
+import { LoginDto } from '@/types/shared/dto/auth/LoginDto';
 import { SignInResult } from './auth.types';
 import {
   generateAccessToken,
@@ -14,7 +14,7 @@ import {
   getSessionByToken,
 } from '@/repositories/sessionRepository';
 import { Tokens } from '@/lib/helpers/tokens.types';
-import { RegisterDto } from '@/types/dto/auth/RegisterDto';
+import { RegisterDto } from '@/types/shared/dto/auth/RegisterDto';
 
 export async function login(userDto: LoginDto): Promise<SignInResult> {
   let isValid = true;

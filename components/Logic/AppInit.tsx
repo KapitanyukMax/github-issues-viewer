@@ -4,7 +4,7 @@ import { getUser } from '@/store/authSlice';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function AppInit() {
+export function AppInit() {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {

@@ -1,8 +1,11 @@
 import axios from 'axios';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, isAnyOf, isPending, isRejected } from '@reduxjs/toolkit';
 import { UserInfo } from '@/types/shared/UserInfo';
-import { AppDispatch, AppThunk } from '.';
+import { LoginDto } from '@/types/shared/dto/auth/LoginDto';
+import { RootState } from '.';
+import { createAppAsyncThunk } from './withTypes';
 import { getErrorMessage } from '@/utils/errors';
+import { RegisterDto } from '@/types/shared/dto/auth/RegisterDto';
 
 interface UserResponseData {
   data: UserInfo;
@@ -10,124 +13,76 @@ interface UserResponseData {
 
 export interface AuthState {
   user: UserInfo | null;
-  loading: boolean;
+  status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
 
 const initialState: AuthState = {
   user: null,
-  loading: false,
+  status: 'idle',
   error: null,
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {
-    setUser(state, action: PayloadAction<UserInfo>) {
-      state.user = action.payload;
-    },
-    clearUser(state) {
-      state.user = null;
-    },
-    setLoading(state) {
-      state.loading = true;
-    },
-    unsetLoading(state) {
-      state.loading = false;
-    },
-    setError(state, action: PayloadAction<string>) {
-      state.error = action.payload;
-    },
-    clearError(state) {
-      state.error = null;
-    },
+  reducers: {},
+  extraReducers: builder => {
+    builder
+      .addCase(logout.fulfilled, () => initialState)
+      .addMatcher(
+        isAnyOf(login.fulfilled, register.fulfilled, getUser.fulfilled),
+        (state, action) => {
+          state.user = action.payload;
+          state.status = 'idle';
+        }
+      )
+      .addMatcher(isPending, state => {
+        state.status = 'loading';
+      })
+      .addMatcher(isRejected, (state, action) => {
+        state.status = 'failed';
+        state.error = getErrorMessage(action.error);
+      });
   },
 });
 
-export const login = (email: string, password: string): AppThunk => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(authSlice.actions.setLoading());
-    try {
-      const res = await axios.post('/api/auth/login', { email, password });
-      const { data: user } = res.data as UserResponseData;
+export const login = createAppAsyncThunk('auth/login', async (user: LoginDto) => {
+  const res = await axios.post('/api/auth/login', user);
+  const { data: userInfo } = res.data as UserResponseData;
+  return userInfo;
+});
 
-      dispatch(authSlice.actions.setUser(user));
-      dispatch(authSlice.actions.clearError());
-    } catch (error) {
-      dispatch(authSlice.actions.setError(getErrorMessage(error)));
-      dispatch(authSlice.actions.clearUser());
-    } finally {
-      dispatch(authSlice.actions.unsetLoading());
-    }
+export const logout = createAppAsyncThunk('auth/logout', async () => {
+  await axios.post('/api/auth/logout');
+});
+
+export const register = createAppAsyncThunk('auth/register', async (user: RegisterDto) => {
+  const res = await axios.post('/api/auth/register', user);
+  const { data: userInfo } = res.data as UserResponseData;
+  return userInfo;
+});
+
+export const getUser = createAppAsyncThunk('auth/getUser', async (_, thunkAPI) => {
+  const fetchProfile = async () => {
+    const res = await axios.get('/api/profile');
+    const { data: user } = res.data as UserResponseData;
+    return user;
   };
-};
 
-export const logout = (): AppThunk => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(authSlice.actions.setLoading());
+  try {
+    return await fetchProfile();
+  } catch {
     try {
-      await axios.post('/api/auth/logout');
-      dispatch(authSlice.actions.clearError());
-    } catch (error) {
-      dispatch(authSlice.actions.setError(getErrorMessage(error)));
-    } finally {
-      dispatch(authSlice.actions.clearUser());
-      dispatch(authSlice.actions.unsetLoading());
-    }
-  };
-};
-
-export const register = (email: string, password: string, name: string): AppThunk => {
-  return async (dispatch: AppDispatch) => {
-    dispatch(authSlice.actions.setLoading());
-    try {
-      const res = await axios.post('/api/auth/register', { email, password, name });
-      const { data: user } = res.data as UserResponseData;
-
-      dispatch(authSlice.actions.setUser(user));
-      dispatch(authSlice.actions.clearError());
-    } catch (error) {
-      dispatch(authSlice.actions.setError(getErrorMessage(error)));
-      dispatch(authSlice.actions.clearUser());
-    } finally {
-      dispatch(authSlice.actions.unsetLoading());
-    }
-  };
-};
-
-export const getUser = (): AppThunk => {
-  return async (dispatch: AppDispatch) => {
-    const fetchProfile = async () => {
-      const res = await axios.get('/api/profile');
-      const { data: user } = res.data as UserResponseData;
-      return user;
-    };
-
-    const refresh = async () => {
       await axios.post('/api/auth/refresh');
-    };
-
-    dispatch(authSlice.actions.setLoading());
-    try {
-      let user: UserInfo;
-      try {
-        user = await fetchProfile();
-      } catch {
-        await refresh();
-        user = await fetchProfile();
-      }
-
-      dispatch(authSlice.actions.setUser(user));
-      dispatch(authSlice.actions.clearError());
-    } catch (error) {
-      dispatch(authSlice.actions.clearUser());
-    } finally {
-      dispatch(authSlice.actions.unsetLoading());
+      return await fetchProfile();
+    } catch {
+      return thunkAPI.rejectWithValue('Unauthorized');
     }
-  };
-};
+  }
+});
 
-export const { setError, clearError } = authSlice.actions;
+export const selectUser = (state: RootState) => state.auth.user;
+export const selectAuthStatus = (state: RootState) => state.auth.status;
 
 export default authSlice.reducer;

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { setAuthCookies } from '@/lib/helpers/cookies';
-import { LoginDto } from '@/types/dto/auth/LoginDto';
+import { LoginDto } from '@/types/shared/dto/auth/LoginDto';
 import { validateLoginDto } from '@/lib/validation/login';
 import { login } from '@/services/auth/authService';
 import { getErrorMessage } from '@/lib/helpers/errors';
