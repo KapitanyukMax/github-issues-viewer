@@ -2,7 +2,7 @@
 import { useRef } from 'react';
 import { Provider } from 'react-redux';
 import store, { AppStore } from '@/app/store';
-import { AppInit } from '../components/Logic/AppInit';
+import { AppInit } from '../components/logic/AppInit';
 
 export default function AppLayout({
   children,

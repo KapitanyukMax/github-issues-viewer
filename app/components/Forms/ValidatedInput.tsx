@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { Input } from '../ui/input';
 import { PasswordInput } from './PasswordInput';
 
 export type ValidatedInputProps = React.ComponentProps<'input'> & {
@@ -10,9 +11,7 @@ export function ValidatedInput({ error, className, type, ...props }: ValidatedIn
   const InputComponent =
     type === 'password'
       ? PasswordInput
-      : ({ ...props }: Omit<ValidatedInputProps, 'type'>) => (
-          <ValidatedInput type={type} {...props} />
-        );
+      : ({ ...props }: Omit<ValidatedInputProps, 'type'>) => <Input type={type} {...props} />;
 
   return (
     <div className="flex flex-col space-y-1 w-full">

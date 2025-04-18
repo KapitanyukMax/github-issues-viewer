@@ -4,7 +4,7 @@ import { RootState } from '@/app/store';
 import { Header } from '@/app/components/Header';
 import { SearchBar } from '@/app/components/SearchBar';
 import { NavBar } from '@/app/components/NavBar';
-import { IssuesView } from '@/app/components/Issues/IssuesView';
+import { IssuesView } from '@/app/components/issues/IssuesView';
 
 export default function Home() {
   const repoInfo = useSelector((state: RootState) => state.github.repoInfo);

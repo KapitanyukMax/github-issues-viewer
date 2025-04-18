@@ -24,13 +24,13 @@ export function Header() {
   const handleLoginClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    router.push('/auth/login');
+    router.push('/login');
   };
 
   const handleSignupClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    router.push('/auth/register');
+    router.push('/register');
   };
 
   if (authStatus === 'loading')

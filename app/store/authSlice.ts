@@ -64,29 +64,18 @@ export const register = createAppAsyncThunk('auth/register', async (user: Regist
 });
 
 export const getUser = createAppAsyncThunk('auth/getUser', async (): Promise<UserInfo> => {
-  // const fetchProfile = async () => {
-  //   const res = await axios.get('/api/profile');
-  //   const { data: user } = res.data as UserResponseData;
-  //   return user;
-  // };
-
-  // try {
-  //   return await fetchProfile();
-  // } catch {
-  //   try {
-  //     await axios.post('/api/auth/refresh');
-  //     return await fetchProfile();
-  //   } catch {
-  //     return thunkAPI.rejectWithValue('Unauthorized');
-  //   }
-  // }
-
-  return {
-    email: 'maxkapitaniuk@gmail.com',
-    name: 'Max',
-    role: 'user',
-    id: 3,
+  const fetchProfile = async () => {
+    const res = await axios.get('/api/profile');
+    const { data: user } = res.data as UserResponseData;
+    return user;
   };
+
+  try {
+    return await fetchProfile();
+  } catch {
+    await axios.post('/api/auth/refresh');
+    return await fetchProfile();
+  }
 });
 
 export const selectUser = (state: RootState) => state.auth.user;

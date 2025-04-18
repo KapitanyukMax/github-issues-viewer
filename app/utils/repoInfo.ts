@@ -18,8 +18,8 @@ function getCacheKey(owner: string, repo: string) {
 
 function getTimeDiffStr(fromDate: Date, toDate: Date) {
   const isFuture = fromDate > toDate;
-  let start = isFuture ? toDate : fromDate;
-  let end = isFuture ? fromDate : toDate;
+  const start = isFuture ? toDate : fromDate;
+  const end = isFuture ? fromDate : toDate;
 
   let years = end.getFullYear() - start.getFullYear();
   let months = end.getMonth() - start.getMonth();
@@ -74,16 +74,16 @@ function getIssueStateInfo(issue: IssueInfo) {
   return `${issue.state} ${getTimeDiffStr(time, now)}`;
 }
 
-// function loadFromCache(owner: string, repo: string): RepoInfo | null {
-//   try {
-//     const raw = localStorage.getItem(getCacheKey(owner, repo));
-//     if (!raw) return null;
-//     return JSON.parse(raw) as RepoInfo;
-//   } catch (err) {
-//     console.warn('Failed to read cache:', err);
-//     return null;
-//   }
-// }
+function loadFromCache(owner: string, repo: string): RepoInfo | null {
+  try {
+    const raw = localStorage.getItem(getCacheKey(owner, repo));
+    if (!raw) return null;
+    return JSON.parse(raw) as RepoInfo;
+  } catch (err) {
+    console.warn('Failed to read cache:', err);
+    return null;
+  }
+}
 
 async function fetchGitHubIssues(owner: string, repo: string, page: number): Promise<IssueInfo[]> {
   const url = `https://api.github.com/repos/${owner}/${repo}/issues?per_page=50&page=${page}`;
@@ -122,14 +122,14 @@ async function fetchRepoStars(owner: string, repo: string): Promise<string> {
 }
 
 async function getRepoInfo(owner: string, repo: string, loadMore: boolean): Promise<RepoInfo> {
-  //const cached = loadFromCache(owner, repo);
+  const cached = loadFromCache(owner, repo);
 
   let page = 1;
-  // if (cached) {
-  //   if (loadMore && !cached.isFullyLoaded) {
-  //     page = cached.pagesLoaded + 1;
-  //   } else return cached;
-  // }
+  if (cached) {
+    if (loadMore && !cached.isFullyLoaded) {
+      page = cached.pagesLoaded + 1;
+    } else return cached;
+  }
 
   const issuesInfo = await fetchGitHubIssues(owner, repo, page);
   const isFullyLoaded = issuesInfo.length < 50;
@@ -138,13 +138,12 @@ async function getRepoInfo(owner: string, repo: string, loadMore: boolean): Prom
     owner,
     repo,
     stars: repoStars,
-    issues: [...issuesInfo],
-    //issues: [...(cached?.issues ?? []), ...issuesInfo],
+    issues: [...(cached?.issues ?? []), ...issuesInfo],
     pagesLoaded: page,
     isFullyLoaded,
   };
 
-  //localStorage.setItem(getCacheKey(owner, repo), JSON.stringify(repoInfo));
+  localStorage.setItem(getCacheKey(owner, repo), JSON.stringify(repoInfo));
   return repoInfo;
 }
 
@@ -154,10 +153,10 @@ function updateIssueStatusCache(
   issueIndex: number,
   issueStatus: IssueStatus
 ) {
-  //const cache = loadFromCache(owner, repo);
-  //if (!cache) return;
-  //cache.issues[issueIndex].status = issueStatus;
-  //localStorage.setItem(getCacheKey(owner, repo), JSON.stringify(cache));
+  const cache = loadFromCache(owner, repo);
+  if (!cache) return;
+  cache.issues[issueIndex].status = issueStatus;
+  localStorage.setItem(getCacheKey(owner, repo), JSON.stringify(cache));
 }
 
-export { getRepoInfo, getIssueStateInfo, updateIssueStatusCache };
+export { getCacheKey, getRepoInfo, getIssueStateInfo, updateIssueStatusCache };

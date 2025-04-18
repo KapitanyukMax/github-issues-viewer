@@ -5,7 +5,7 @@ import { loadRepoInfo, clearRepoInfo } from '@/app/store/githubSlice';
 import { Button } from './ui/button';
 import { isValidGitHubRepoUrl, parseGitHubRepoUrl } from '@/app/utils/githubUrls';
 import { AppDispatch } from '@/app/store';
-import { ValidatedInput } from './Forms/ValidatedInput';
+import { ValidatedInput } from './forms/ValidatedInput';
 
 export function SearchBar() {
   const dispatch = useDispatch<AppDispatch>();
@@ -57,6 +57,7 @@ export function SearchBar() {
   return (
     <div className="flex gap-4">
       <ValidatedInput
+        id="search-bar"
         type="url"
         placeholder="Enter repo URL"
         value={url}

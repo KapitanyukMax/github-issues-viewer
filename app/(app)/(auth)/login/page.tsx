@@ -1,7 +1,7 @@
 'use client';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
-import { InputControl } from '@/app/components/Forms/InputControl';
+import { InputControl } from '@/app/components/forms/InputControl';
 import { Button } from '@/app/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
@@ -62,7 +62,7 @@ export default function Login() {
         <Button
           type="button"
           variant="link"
-          onClick={() => router.push('/auth/register')}
+          onClick={() => router.push('/register')}
           className="self-center"
         >
           Register
