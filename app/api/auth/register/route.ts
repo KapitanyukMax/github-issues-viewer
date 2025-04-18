@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { setAuthCookies } from '@/lib/helpers/cookies';
-import { RegisterDto } from '@/types/shared/dto/auth/RegisterDto';
-import { validateRegisterDto } from '@/lib/validation/register';
-import { register } from '@/services/auth/authService';
-import { getErrorMessage } from '@/lib/helpers/errors';
+import { setAuthCookies } from '@/app/api/lib/helpers/cookies';
+import { RegisterDto } from '@/app/types/shared/dto/auth/RegisterDto';
+import { validateRegisterDto } from '@/app/api/lib/validation/register';
+import { register } from '@/app/api/lib/services/auth/authService';
+import { getErrorMessage } from '@/app/api/lib/helpers/errors';
 
 export async function POST(req: NextRequest) {
   const user: RegisterDto = await req.json();

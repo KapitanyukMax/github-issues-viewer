@@ -1,8 +1,8 @@
-import { getUserByAccessToken } from '@/services/auth/authService';
-import { getTokensFromCookies } from '@/lib/helpers/cookies';
-import { NextRequest, NextResponse } from 'next/server';
+import { getUserByAccessToken } from '@/app/api/lib/services/auth/authService';
+import { getTokensFromCookies } from '@/app/api/lib/helpers/cookies';
+import { NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const { accessToken } = await getTokensFromCookies();
   if (!accessToken) {
     return NextResponse.json({ error: 'Unauthorized - No access token' }, { status: 401 });

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getTokensFromCookies, setAuthCookies } from '@/lib/helpers/cookies';
-import { refresh } from '@/services/auth/authService';
-import { getErrorMessage } from '@/lib/helpers/errors';
+import { getTokensFromCookies, setAuthCookies } from '@/app/api/lib/helpers/cookies';
+import { refresh } from '@/app/api/lib/services/auth/authService';
+import { getErrorMessage } from '@/app/api/lib/helpers/errors';
 
 export async function POST() {
   const tokens = await getTokensFromCookies();

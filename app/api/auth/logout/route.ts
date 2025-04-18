@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getTokensFromCookies, clearAuthCookies } from '@/lib/helpers/cookies';
-import { logout } from '@/services/auth/authService';
-import { getErrorMessage } from '@/lib/helpers/errors';
+import { getTokensFromCookies, clearAuthCookies } from '@/app/api/lib/helpers/cookies';
+import { logout } from '@/app/api/lib/services/auth/authService';
+import { getErrorMessage } from '@/app/api/lib/helpers/errors';
 
 export async function POST() {
   try {
