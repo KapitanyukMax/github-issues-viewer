@@ -19,14 +19,7 @@ export function InputControl({ id, label, ...props }: InputControlProps) {
       <Label htmlFor={id} className={cn(isError && 'text-red-500')}>
         {label}
       </Label>
-      <ValidatedInput
-        id={id}
-        value={field.value}
-        onChange={field.onChange}
-        onBlur={field.onBlur}
-        error={error}
-        {...props}
-      />
+      <ValidatedInput id={id} {...field} {...props} error={error} />
     </div>
   );
 }

@@ -48,19 +48,31 @@ const authSlice = createSlice({
 });
 
 export const login = createAppAsyncThunk('auth/login', async (user: LoginDto) => {
-  const res = await axios.post('/api/auth/login', user);
-  const { data: userInfo } = res.data as UserResponseData;
-  return userInfo;
+  try {
+    const res = await axios.post('/api/auth/login', user);
+    const { data: userInfo } = res.data as UserResponseData;
+    return userInfo;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
 });
 
 export const logout = createAppAsyncThunk('auth/logout', async () => {
-  await axios.post('/api/auth/logout');
+  try {
+    await axios.post('/api/auth/logout');
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
 });
 
 export const register = createAppAsyncThunk('auth/register', async (user: RegisterDto) => {
-  const res = await axios.post('/api/auth/register', user);
-  const { data: userInfo } = res.data as UserResponseData;
-  return userInfo;
+  try {
+    const res = await axios.post('/api/auth/register', user);
+    const { data: userInfo } = res.data as UserResponseData;
+    return userInfo;
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
 });
 
 export const getUser = createAppAsyncThunk('auth/getUser', async (): Promise<UserInfo> => {
@@ -71,14 +83,20 @@ export const getUser = createAppAsyncThunk('auth/getUser', async (): Promise<Use
   };
 
   try {
-    return await fetchProfile();
-  } catch {
-    await axios.post('/api/auth/refresh');
-    return await fetchProfile();
+    try {
+      return await fetchProfile();
+    } catch {
+      await axios.post('/api/auth/refresh');
+      return await fetchProfile();
+    }
+  } catch (error) {
+    console.log(error);
+    throw new Error(getErrorMessage(error));
   }
 });
 
 export const selectUser = (state: RootState) => state.auth.user;
 export const selectAuthStatus = (state: RootState) => state.auth.status;
+export const selectAuthError = (state: RootState) => state.auth.error;
 
 export default authSlice.reducer;

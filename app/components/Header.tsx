@@ -42,7 +42,12 @@ export function Header() {
     );
 
   return (
-    <menu className={cn('flex flex-row gap-4 pb-4', user ? 'justify-between' : 'justify-end')}>
+    <header
+      className={cn(
+        'flex flex-row gap-4 pb-4 items-baseline',
+        user ? 'justify-between' : 'justify-end'
+      )}
+    >
       {user ? (
         <>
           <ProfileInfo user={user} />
@@ -60,6 +65,6 @@ export function Header() {
           </Button>
         </>
       )}
-    </menu>
+    </header>
   );
 }

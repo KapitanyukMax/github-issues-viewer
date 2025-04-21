@@ -8,7 +8,7 @@ const INVALID_NAME_END = 'Invalid name';
 export const getErrorMessage = (error: unknown) =>
   error instanceof AxiosError
     ? (error.response?.data?.error ?? error.message)
-    : error instanceof Error
+    : typeof error === 'object' && error !== null && 'message' in error
       ? error.message
       : typeof error === 'string'
         ? error
